@@ -1,0 +1,30 @@
+{
+  "name": "Astroflow",
+  "version": "0.1.0",
+  "description": "Optical flow research tool",
+  "main": "server/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./node_modules/.bin/electron .",
+    "package": "./node_modules/.bin/electron-packager . Served --all --version=0.37.7 --ignore=dist --out=dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mathnathan/Astroflow.git"
+  },
+  "keywords": [
+  ],
+  "author": "Nathan Crock",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mathnathan/Astroflow/issues"
+  },
+  "homepage": "https://github.com/mathnathan/Astroflow#readme",
+  "devDependencies": {
+    "electron-packager": "^7.0.1",
+    "electron-prebuilt": "0.37.7"
+  },
+  "dependencies": {
+    "d3": "^3.5.12"
+  }
+}
