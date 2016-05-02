@@ -66,12 +66,12 @@ app.on('ready', function() {
   webContents.on('did-finish-load', function() { // built-in event
 
     // We know the webpage is loaded, so we can start interacting with it now
-    ipcMain.on('test-event', function(event, message) {
+    ipcMain.on('load-file', function(event, file) {
       // arguments is everything the function gets, whether you named it or not
       //console.log("arguments:", arguments)
-      console.log("message:", message)
+      console.log("file:", file.name, file.path)
 
-      exec('pwd .', function(err, stdout, stderr) {
+      exec('ls -lah ' + file.path, function(err, stdout, stderr) {
         console.log("stdout:", stdout)
         webContents.send('test-event-response', stdout)
       })
