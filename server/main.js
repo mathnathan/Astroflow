@@ -35,7 +35,7 @@ app.on('ready', function() {
     height: 900,
     minWidth: 600,
     minHeight: 200,
-    'accept-first-mouse': true,
+    'acceptFirstMouse': true,
     //'title-bar-style': 'hidden'
   });
 
@@ -69,10 +69,22 @@ app.on('ready', function() {
     ipcMain.on('load-file', function(event, file) {
       // arguments is everything the function gets, whether you named it or not
       //console.log("arguments:", arguments)
-      console.log("file:", file.name, file.path)
 
       exec('ls -lah ' + file.path, function(err, stdout, stderr) {
-        console.log("stdout:", stdout)
+        console.log("ls on inputFile:", stdout)
+        console.log("file.name = ", file.name)
+        console.log("file.path = ", file.path)
+        webContents.send('test-event-response', stdout)
+      })
+
+      exec('file bin/routes', function(err, stdout, stderr) {
+        console.log("ls on flask server:", stdout)
+        webContents.send('test-event-response', stdout)
+      })
+
+      exec('bin/routes ' + file.path, function(err, stdout, stderr) {
+        console.log("stderr = ", stderr)
+        console.log("running flask server on file?:", stdout)
         webContents.send('test-event-response', stdout)
       })
     });
