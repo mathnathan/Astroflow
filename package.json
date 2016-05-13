@@ -12,8 +12,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/mathnathan/Astroflow.git"
   },
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "Nathan Crock",
   "license": "MIT",
   "bugs": {
@@ -25,6 +24,7 @@
     "electron-prebuilt": "0.37.7"
   },
   "dependencies": {
-    "d3": "^3.5.12"
+    "d3": "^3.5.12",
+    "request": "^2.72.0"
   }
 }
