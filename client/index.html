@@ -11,23 +11,31 @@
     <div id="header">
     </div>
     <div id="content">
+      <div id="controls">
+        <form id="new-file-form">
+          <input type="file" id="new-file" multiple>
+          <br/>
+          <div class="label">
+            Drag and drop your research data here
+          </div>
+        </form>
 
-      <form id="new-file-form">
-        <input type="file" id="new-file" multiple>
-        <br/>
-        <div class="label">
-          Drag and drop your research data here
-        </div>
-      </form>
-
-      <button type="button" id="calc-flux">Calc flux</button>
-      <button type="button" id="find-hotspots">Find Hotspots</button>
-
-      <div id="average">
-        <canvas></canvas>
+        <br>
+        <button type="button" id="calc-flux">Calc flux</button>
+        <br>
+        <button type="button" id="find-hotspots">Find Hotspots</button>
+        <br>
+        <button type="button" id="test-frame">Test Frame</button>
+        <br>
+        <button type="button" id="test-flow">Test Flow</button>
       </div>
-    </div>
 
+      <div id="analysis">
+        <canvas id="frame"></canvas>
+        
+      </div>
+
+    </div>
     <script src="app.js"></script>
   </body>
 </html>

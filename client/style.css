@@ -8,6 +8,7 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  color: white;
 }
 
 /*
@@ -30,4 +31,24 @@ body {
   width: 100%;
   height: 100%;
   /* top: 25px; */
+}
+
+#controls {
+  width: 150px;
+  height: 100%;
+  background-color: #222;
+}
+#analysis {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 150px;
+  width: calc(100% - 150px);
+  height: 100%;
+  background-color: #444;
+}
+#frame {
+  margin: 50px auto;
+  width: 500px;
+  height: 500px;
 }

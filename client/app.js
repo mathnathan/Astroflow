@@ -6,6 +6,10 @@ var request = require('request')
 console.log("loaded")
 ipc.on("server-ready", ready)
 
+var URL = 'http://localhost:5000/';
+
+var META = {};
+
 function ready() {
   // all of our UI code will begin executing here.
   // it's fine to define functions outside of this ready function,
@@ -22,6 +26,13 @@ function ready() {
   // Button for finding hotspots (Does nothing for some reason)
   var findHotspots = document.getElementById("find-hotspots");
   findHotspots.addEventListener('click', queryFlask("findHotspots", handleHotspots), false);
+
+  d3.select("#test-frame").on("click", function() {
+    getFrame(0);
+  })
+  d3.select("#test-flow").on("click", function() {
+
+  })
 }
 
 function handleHotspots(error, hotspots) {
@@ -35,7 +46,7 @@ function queryFlask(command, callback) {
   // we return the function the event handler will call when an event happens (button clicked)
   return function() {
     var options = {
-      uri: 'http://localhost:5000/'+command,
+      uri: URL + command,
       method: 'POST',
       json: {
         "path": [[167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.288086, 167.417969, 167.547852, 167.547852, 167.547852, 167.547852, 167.677734, 167.677734, 167.807617, 167.807617, 167.807617, 167.807617, 167.807617, 167.807617, 167.807617, 167.807617, 167.807617, 168.067383, 168.067383, 168.067383, 168.067383, 168.067383, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.197266, 168.327148, 168.327148, 168.327148, 168.457031, 168.586914, 168.716797, 168.716797, 168.716797, 168.846680, 168.976562, 168.976562, 168.976562, 169.106445, 169.106445, 169.366211, 169.366211, 169.366211, 169.366211, 169.366211, 169.496094, 169.496094, 169.496094, 169.496094, 169.496094, 169.496094, 169.625977, 169.625977, 169.625977, 169.625977, 169.755859, 169.755859, 169.755859, 169.755859, 169.755859, 169.755859, 169.755859, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 170.015625, 169.885742, 169.885742, 169.755859, 169.755859, 169.625977, 169.366211, 169.236328, 169.236328, 169.106445, 168.976562, 168.976562, 168.716797, 168.586914, 168.457031, 168.457031, 168.327148, 168.327148, 168.197266, 168.067383, 168.067383, 167.937500, 167.937500, 167.807617, 167.807617, 167.807617, 167.677734, 167.677734, 167.417969, 167.417969, 167.288086, 167.288086, 167.288086, 167.158203, 167.158203, 167.158203, 167.158203, 167.158203, 167.028320, 167.028320, 167.028320, 166.638672, 166.508789, 166.508789, 166.508789, 166.508789, 166.508789, 166.508789, 166.378906, 166.378906, 166.378906, 166.378906, 166.249023, 166.119141, 165.989258, 165.989258, 165.989258, 165.989258, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.859375, 165.729492, 165.729492, 165.469727, 165.339844, 165.469727],
@@ -59,6 +70,46 @@ function queryFlask(command, callback) {
 // http://localhost:5000/findHotspots
 // http://localhost:5000/calcFlux
 
+function getFrame(i) {
+  console.log("get frame", i)
+  d3.json(URL + "getFrame?i=" + i, function(err, frame) {
+    console.log("frame", frame)
+    renderFrame(frame, i)
+  })
+}
+
+function renderFrame(frame,i) {
+  var canvas = d3.select("#frame").node()
+  var ctx = canvas.getContext('2d');
+  var data = frame['frame' + i];
+
+  var min = d3.min(data, function(row) {
+    return d3.min(row)
+  })
+  var max = d3.max(data, function(row) {
+    return d3.max(row)
+  })
+  console.log("min, max", min,max);
+
+  var width = 500;
+  var height = 500;
+  var rw = width/ META.xdim
+  var rh = height / META.ydim
+
+  ctx.clearRect(0, 0, width, height)
+
+  var colorScale = d3.scale.linear()
+    .domain([min, max])
+    .range(["#253494", "#ffffcc"])
+
+  data.forEach(function(row, j) {
+    row.forEach(function(d, i) {
+      ctx.fillStyle = colorScale(d);
+      ctx.fillRect(i * rw, j * rh, rw, rh)
+    })
+  })
+}
+
 
 // when a file is selected (or dropped on the app) we process it
 function handleFile(evt) {
@@ -75,12 +126,29 @@ function handleFile(evt) {
   // (but we don't actually process it in the client)
   ipc.send("load-file", {name: file.name, path: file.path})
 }
+
 // this function gets called when the user drags a file over
 function handleFileDrag(evt) {
   evt.stopPropagation();
   evt.preventDefault();
   evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
 }
+
+
+function getMetadata() {
+  d3.json(URL + "getMetadata", function(err, meta) {
+    console.log("meta", meta)
+    META.frames = 23
+    META.xdim = 306
+    META.ydim = 306
+  })
+}
+
+ipc.on("server-started", function() {
+  console.log("server started!")
+  getMetadata();
+  getFrame(0)
+});
 
 ipc.on("test-event-response", function() {
   console.log("response:")
