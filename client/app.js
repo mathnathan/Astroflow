@@ -74,14 +74,14 @@ function getFrame(i) {
   console.log("get frame", i)
   d3.json(URL + "getFrame?i=" + i, function(err, frame) {
     console.log("frame", frame)
-    renderFrame(frame, i)
+    renderFrame(frame)
   })
 }
 
-function renderFrame(frame,i) {
+function renderFrame(frame) {
   var canvas = d3.select("#frame").node()
   var ctx = canvas.getContext('2d');
-  var data = frame['frame' + i];
+  var data = frame['frame'];
 
   var min = d3.min(data, function(row) {
     return d3.min(row)
