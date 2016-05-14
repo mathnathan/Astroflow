@@ -74,14 +74,20 @@ function getFrame(i) {
   console.log("get frame", i)
   d3.json(URL + "getFrame?i=" + i, function(err, frame) {
     console.log("frame", frame)
-    renderFrame(frame)
+    renderFrame(frame.frame)
+  })
+}
+function getAverage(callback) {
+  d3.json(URL + "getAverage", function(err, frame) {
+    console.log("frame", frame)
+    renderFrame(frame.average)
+    callback(frame)
   })
 }
 
-function renderFrame(frame) {
+function renderFrame(data) {
   var canvas = d3.select("#frame").node()
   var ctx = canvas.getContext('2d');
-  var data = frame['frame'];
 
   var min = d3.min(data, function(row) {
     return d3.min(row)
@@ -93,6 +99,8 @@ function renderFrame(frame) {
 
   var width = 500;
   var height = 500;
+  canvas.width = width;
+  canvas.height = height;
   var rw = width/ META.xdim
   var rh = height / META.ydim
 
@@ -113,6 +121,8 @@ function renderFrame(frame) {
 
 // when a file is selected (or dropped on the app) we process it
 function handleFile(evt) {
+  d3.select("#loading").classed("hidden", false)
+  d3.select("#instructions").classed("hidden", true)
   evt.stopPropagation();
   evt.preventDefault();
   var files = this.files
@@ -138,16 +148,20 @@ function handleFileDrag(evt) {
 function getMetadata() {
   d3.json(URL + "getMetadata", function(err, meta) {
     console.log("meta", meta)
-    META.frames = 23
-    META.xdim = 306
-    META.ydim = 306
+    META.frames = meta.frames
+    META.xdim = meta.xdim
+    META.ydim = meta.ydim
   })
 }
 
 ipc.on("server-started", function() {
   console.log("server started!")
   getMetadata();
-  getFrame(0)
+  getAverage(function() {
+    d3.select("#analysis").classed("hidden", false)
+    d3.select("#loading").classed("hidden", true)
+  });
+  //getFrame(0)
 });
 
 ipc.on("test-event-response", function() {

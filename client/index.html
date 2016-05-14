@@ -11,29 +11,27 @@
     <div id="header">
     </div>
     <div id="content">
-      <div id="controls">
-        <form id="new-file-form">
-          <input type="file" id="new-file" multiple>
-          <br/>
-          <div class="label">
-            Drag and drop your research data here
-          </div>
-        </form>
-
-        <br>
-        <button type="button" id="calc-flux">Calc flux</button>
-        <br>
-        <button type="button" id="find-hotspots">Find Hotspots</button>
-        <br>
-        <button type="button" id="test-frame">Test Frame</button>
-        <br>
-        <button type="button" id="test-flow">Test Flow</button>
+      <div id="instructions">
+          Drag and drop your research data anywhere on the app.
+          <form id="new-file-form">
+            <input id="new-file" type="file">
+            <label id="new-file-button" for="new-file">Select file</label>
+            <br/>
+          </form>
       </div>
-
-      <div id="analysis">
+      <div id="loading" class="hidden">
+        LOADING
+      </div>
+      <div id="analysis" class="hidden">
         <canvas id="frame"></canvas>
-        
+        <div id="controls">
+          <button type="button" id="calc-flux">Calc flux</button>
+          <button type="button" id="find-hotspots">Find Hotspots</button>
+          <button type="button" id="test-frame">Test Frame</button>
+          <button type="button" id="test-flow">Test Flow</button>
+        </div>
       </div>
+
 
     </div>
     <script src="app.js"></script>
