@@ -51,7 +51,7 @@ app.on('will-quit', function() {
 app.on('ready', function() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1200,
+    width: 1400,
     height: 900,
     minWidth: 600,
     minHeight: 200,
