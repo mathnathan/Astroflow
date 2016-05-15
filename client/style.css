@@ -100,7 +100,8 @@ body {
   width: 80px;
   margin-left: 20px;
 }
-#draw-button {
+
+.button {
   font-size: 20px;
   text-decoration: underline;
   text-decoration-line: dashed;
@@ -113,8 +114,8 @@ body {
 
 #canvii {
   margin: 0px auto;
-  width: 700px;
-  height: 700px;
+  width: 600px;
+  height: 600px;
 }
 #frame {
   position: absolute;
@@ -126,4 +127,39 @@ body {
   position: absolute;
   pointer-events: none;
   border: 1px solid white;
+}
+
+#frames {
+  height: 150px;
+  margin-top: 10px;
+  position: relative;
+}
+
+#frames, #over-time, #frame-bars, #frame-brush, #title {
+  width: 700px;
+}
+
+path.flux {
+  fill: none;
+  stroke: rgba(10, 220, 80, 0.8);
+}
+
+#over-time {
+  height: 75px;
+}
+
+#frame-bars {
+}
+
+#frame-bars .bar {
+  position: absolute;
+  height: 40px;
+  background-color: #ddd;
+}
+#frame-bars .bar:hover {
+  background-color: white;
+}
+
+#frame-brush {
+  height: 30px;
 }

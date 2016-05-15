@@ -22,6 +22,7 @@
       <div id="loading" class="hidden">
         LOADING
       </div>
+      <div id="title"></div>
       <div id="analysis" class="hidden">
         <div id="canvii">
           <canvas id="frame"></canvas>
@@ -29,11 +30,26 @@
         </div>
         <div id="controls">
           <a id="draw-button" class="button">draw</a>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <a id="average-button" class="button">average</a>
         </div>
+      </div>
+      <div id="frames">
+        <svg id="over-time">
+          <g id="flux"></g>
+          <g id="hotspots"></g>
+        </svg>
+        <div id="frame-bars"></div>
+        <svg id="frame-brush"></svg>
       </div>
 
 
     </div>
     <script src="app.js"></script>
+    <script src="frames.js"></script>
   </body>
 </html>

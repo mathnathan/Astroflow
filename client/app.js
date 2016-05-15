@@ -9,8 +9,8 @@ ipc.on("server-ready", ready)
 
 var URL = 'http://localhost:5000/';
 
-var width = 700;
-var height = 700;
+var width = 600;
+var height = 600;
 
 var META = {};
 
@@ -22,9 +22,14 @@ var scale = 1;
 var pathX = [];
 var pathY = [];
 // we cache our frames and average globally
-var frameCache = {}
-var average = {};
-var currentFrame = {};
+var frameCache = {};
+var average;
+var currentFrame;
+var currentIndex = "Average";
+var flux = []
+
+var hotspots = [];
+var flows = [];
 
 var canvas, ctx;
 var curvectx;
@@ -68,13 +73,6 @@ function ready() {
     .scaleExtent([0.5, 20])
     .on("zoomstart", function() {
       if(drawing) {
-        /*
-        var x = d3.event.sourceEvent.layerX - tx;
-        var y = d3.event.sourceEvent.layerY - ty;
-        console.log("start", x, y)
-        pathX = [x/scale];
-        pathY = [y/scale];
-        */
         pathX = []
         pathY = []
       }
@@ -102,7 +100,9 @@ function ready() {
           var y = pathY[i]
           points.push({x:x, y:y})
         })
-        var simplified = simplify(points, 2)
+        // the 2nd argument is a threshold, a value of 1 won't simplify
+        // bigger number means more aggressive simplifying
+        var simplified = simplify(points, 1.4)
         pathX = []
         pathY = []
         simplified.forEach(function(p) {
@@ -120,6 +120,7 @@ function ready() {
 
 function renderFrame() {
   var data = currentFrame;
+  d3.select("#title").text(currentIndex)
 
   var min = d3.min(data, function(row) {
     return d3.min(row)
@@ -189,6 +190,7 @@ function handleFile(evt) {
   // we tell the server about the file
   // (but we don't actually process it in the client)
   ipc.send("load-file", {name: file.name, path: file.path})
+  d3.select("title").text("Astroflow: " + file.name)
 }
 
 // this function gets called when the user drags a file over
@@ -205,6 +207,7 @@ function getMetadata() {
     META.frames = meta.frames
     META.xdim = meta.xdim
     META.ydim = meta.ydim
+    renderFramesUI();
   })
 }
 
@@ -212,12 +215,14 @@ function getFrame(i) {
   console.log("get frame", i)
   if(frameCache[i]) {
     currentFrame = frameCache[i].frame;
+    currentIndex = i;
     renderFrame()
   } else {
     d3.json(URL + "getFrame?i=" + i, function(err, frame) {
       console.log("frame", frame)
       frameCache[i] = frame
       currentFrame = frame.frame;
+      currentIndex = i;
       renderFrame()
     })
   }
@@ -228,14 +233,13 @@ function getAverage(callback) {
     console.log("frame", frame)
     average = frame.average
     currentFrame = average;
+    currentIndex = "Average";
     renderFrame()
     callback(frame)
   })
 }
 
 function getFlux() {
-  // TODO: can't send pixel coordinates directly to the server, need to scale it
-  // down from the width to the pixels
   var dataX = []
   var dataY = []
   pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
@@ -254,6 +258,8 @@ function getFlux() {
     // node convention is to allways put error as first argument, and pass null if no error
     // the body is the JSON payload we want
     console.log("flux", body);
+    flux = body.flux;
+    renderFlux();
   });
 }
 
