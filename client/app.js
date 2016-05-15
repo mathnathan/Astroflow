@@ -28,6 +28,10 @@ function ready() {
   var findHotspots = document.getElementById("find-hotspots");
   findHotspots.addEventListener('click', handleHotspots, false);
 
+  // Button for calculating Flux
+  var calcFlux = document.getElementById("calc-flux");
+  calcFlux.addEventListener('click', handleFlux, false);
+
   d3.select("#test-frame").on("click", function() {
     getFrame(0);
   })
@@ -35,6 +39,29 @@ function ready() {
 
   })
 }
+
+
+function handleFlux(error, hotspots) {
+
+  var options = {
+    uri: URL + "calcFlux",
+    method: 'POST',
+    json: { "path": PATH }
+  };
+
+  request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+    } else {
+      console.log("error = ", error);
+    }
+    // node convention is to allways put error as first argument, and pass null if no error
+    // the body is the JSON payload we want
+    console.log("Button Clicked!");
+    console.log("flux", body);
+  });
+
+}
+
 
 function handleHotspots(error, hotspots) {
 
