@@ -1,3 +1,5 @@
+var kb = require('./keybinding')
+
 // UI for dealing with individual frames
 var framesWidth = width + 100;
 // this function will be called when metadata is returned so we can choose frames
@@ -28,10 +30,19 @@ function renderFramesUI() {
       currentIndex = "Average"
       renderFrame();
     })
+  
+  d3.select("body").call( d3.keybinding()
+    .on('arrow-left', function() {
+      if(currentIndex !== "Average") {getFrame(currentIndex-1)}
+    })
+    .on('arrow-right', function () {
+      if(currentIndex !== "Average") {getFrame(currentIndex+1)}
+    })
+  );
 }
 
 
-function renderFlux() {
+function renderFlux(start, stop) {
   var frameIndices = d3.range(META.frames)
   var bw = framesWidth / META.frames;
 

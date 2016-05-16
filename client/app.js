@@ -62,10 +62,10 @@ function ready() {
     var button = d3.select(this)
       .classed("active", drawing)
       .text(function() {
-        if(drawing) return "drawing";
-        return "draw";
+        if(drawing) return "Drawing";
+        return "Draw";
       })
-    d3.select("#frame").classed("drawing", drawing)
+    d3.select("#frame").classed("Drawing", drawing)
   })
 
   var zoom = d3.behavior.zoom()
@@ -102,7 +102,7 @@ function ready() {
         })
         // the 2nd argument is a threshold, a value of 1 won't simplify
         // bigger number means more aggressive simplifying
-        var simplified = simplify(points, 1.4)
+        var simplified = simplify(points, 0.4)
         pathX = []
         pathY = []
         simplified.forEach(function(p) {
@@ -242,12 +242,14 @@ function getAverage(callback) {
 function getFlux() {
   var dataX = []
   var dataY = []
+  var start = 191
+  var stop = 196
   pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
   pathY.forEach(function(y) { dataY.push(y/width * META.ydim)})
   var options = {
     uri: URL + "calcFlux",
     method: 'POST',
-    json: { "path": [dataX, dataY]}
+    json: { "beg": start, "end": stop, "path": [dataX, dataY]}
   };
 
   request(options, function (error, response, body) {
@@ -259,7 +261,7 @@ function getFlux() {
     // the body is the JSON payload we want
     console.log("flux", body);
     flux = body.flux;
-    renderFlux();
+    renderFlux(start, stop);
   });
 }
 
@@ -271,7 +273,7 @@ function getHotspots() {
   var options = {
     uri: URL + "findHotspots",
     method: 'POST',
-    json: { "path": [dataX, dataY]}
+    json: { "beg": 100, "end": 196, "path": [dataX, dataY]}
   };
 
   request(options, function (error, response, body) {
