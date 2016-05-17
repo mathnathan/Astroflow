@@ -102,14 +102,31 @@ function simplifyDouglasPeucker(points, sqTolerance) {
 // both algorithms combined for awesome performance
 function simplify(points, tolerance, highestQuality) {
 
-    if (points.length <= 2) return points;
+    if (points.length <= 4) {
+      console.log("BAD THINGS ARE HAPPENING. DEAL WITH THIS WHEN YOU LEARN MORE JS"); 
+      // Somehow gracefully abort calculating flux and hotspots. Ask for new path
+      return points // Do this for now so the program doesn't hang
+    }
 
     var sqTolerance = tolerance !== undefined ? tolerance * tolerance : 1;
+    var newPoints = null;
+    var notEnoughPoints = true;
+    while(notEnoughPoints) {
+      console.log("Looping");
+      newPoints = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
+      newPoints = simplifyDouglasPeucker(newPoints, sqTolerance);
+      if(newPoints.length >= 4) {
+        notEnoughPoints = false;
+      } else if (sqTolerance > 0.05) {
+          sqTolerance = sqTolerance - 0.05;
+      } else {
+          console.log("BAD THINGS ARE HAPPENING. DEAL WITH THIS WHEN YOU LEARN MORE JS"); 
+          // Somehow gracefully abort calculating flux and hotspots. Ask for new path
+          return points // Do this for now so the program doesn't hang
+      }
+    }
 
-    points = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
-    points = simplifyDouglasPeucker(points, sqTolerance);
-
-    return points;
+    return newPoints;
 }
 
 // export as AMD module / Node module / browser or worker variable

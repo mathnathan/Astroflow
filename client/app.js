@@ -107,7 +107,7 @@ function ready() {
         })
         // the 2nd argument is a threshold, a value of 1 won't simplify
         // bigger number means more aggressive simplifying
-        var simplified = simplify(points, 0.4)
+        var simplified = simplify(points, 0.3)
         pathX = []
         pathY = []
         simplified.forEach(function(p) {
@@ -122,18 +122,21 @@ function ready() {
     })
   d3.select("#frame").call(zoom)
   
-  d3.select("#slice-begin").on("input", handleSliceBegin(this.value));
-  d3.select("#slice-end").on("input", handleSliceEnd(this.value));
+  d3.select("#slice-begin").on("input", handleSliceBegin);
+  d3.select("#slice-end").on("input", handleSliceEnd);
+
+  d3.select("#calcFlux-button").on("click", getFlux);
+  d3.select("#findHotspots-button").on("click", getHotspots);
 }
 
-function handleSliceBegin(newVal) {
-  console.log("newVal = ", newVal);
-  start = newVal;
+function handleSliceBegin() {
+  console.log("this.value = ", this.value);
+  start = this.value;
 }
   
 function handleSliceEnd(newVal) {
-  console.log("newVal = ", newVal);
-  stop = newVal;
+  console.log("this.value = ", this.value);
+  stop = this.value;
 }
 
 function renderFrame() {
@@ -259,49 +262,53 @@ function getAverage(callback) {
 }
 
 function getFlux() {
-  var dataX = []
-  var dataY = []
-  pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
-  pathY.forEach(function(y) { dataY.push(y/width * META.ydim)})
-  var options = {
-    uri: URL + "calcFlux",
-    method: 'POST',
-    json: { "beg": start, "end": stop, "path": [dataX, dataY]}
-  };
+  if(pathX.length >= 4 && pathY.length >= 4) { // Ensure a path has been collected
+    var dataX = []
+    var dataY = []
+    pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
+    pathY.forEach(function(y) { dataY.push(y/width * META.ydim)})
+    var options = {
+      uri: URL + "calcFlux",
+      method: 'POST',
+      json: { "beg": start, "end": stop, "path": [dataX, dataY]}
+    };
 
-  request(options, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-    } else {
-      console.log("error", error);
-    }
-    // node convention is to allways put error as first argument, and pass null if no error
-    // the body is the JSON payload we want
-    console.log("flux", body);
-    flux = body.flux;
-    renderFlux(start, stop);
-  });
+    request(options, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+      } else {
+        console.log("error", error);
+      }
+      // node convention is to allways put error as first argument, and pass null if no error
+      // the body is the JSON payload we want
+      console.log("flux", body);
+      flux = body.flux;
+      renderFlux(start, stop);
+    });
+  }
 }
 
 function getHotspots() {
-  var dataX = []
-  var dataY = []
-  pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
-  pathY.forEach(function(y) { dataY.push(y/width * META.ydim)})
-  var options = {
-    uri: URL + "findHotspots",
-    method: 'POST',
-    json: { "beg": start, "end": stop, "path": [dataX, dataY]}
-  };
+  if(pathX.length >= 4 && pathY.length >= 4) { // Ensure a path has been collected
+    var dataX = []
+    var dataY = []
+    pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
+    pathY.forEach(function(y) { dataY.push(y/width * META.ydim)})
+    var options = {
+      uri: URL + "findHotspots",
+      method: 'POST',
+      json: { "beg": start, "end": stop, "path": [dataX, dataY]}
+    };
 
-  request(options, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-    } else {
-      console.log("error", error);
-    }
-    // node convention is to allways put error as first argument, and pass null if no error
-    // the body is the JSON payload we want
-    console.log("hotspots", body);
-  });
+    request(options, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+      } else {
+        console.log("error", error);
+      }
+      // node convention is to allways put error as first argument, and pass null if no error
+      // the body is the JSON payload we want
+      console.log("hotspots", body);
+    });
+  }
 }
 
 ipc.on("server-started", function() {
