@@ -52,7 +52,7 @@ function renderFlux(start, stop) {
     .range([0, 75])
 
   var line = d3.svg.line()
-    .x(function(d,i) { return i * bw })
+    .x(function(d,i) { return i+start * bw })
     .y(function(d,i) { return fluxScale(d) })
 
   var fluxg = d3.select("g#flux");

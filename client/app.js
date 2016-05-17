@@ -34,6 +34,11 @@ var flows = [];
 var canvas, ctx;
 var curvectx;
 
+// Global variable for slicing. Will be accessible to user and all functions should 
+// use them
+var start = 0;
+var stop = -1;
+
 function ready() {
   // all of our UI code will begin executing here.
   // it's fine to define functions outside of this ready function,
@@ -116,6 +121,19 @@ function ready() {
       }
     })
   d3.select("#frame").call(zoom)
+  
+  d3.select("#slice-begin").on("input", handleSliceBegin(this.value));
+  d3.select("#slice-end").on("input", handleSliceEnd(this.value));
+}
+
+function handleSliceBegin(newVal) {
+  console.log("newVal = ", newVal);
+  start = newVal;
+}
+  
+function handleSliceEnd(newVal) {
+  console.log("newVal = ", newVal);
+  stop = newVal;
 }
 
 function renderFrame() {
@@ -201,12 +219,13 @@ function handleFileDrag(evt) {
 }
 
 
-function getMetadata() {
+function getMetadata(callback) {
   d3.json(URL + "getMetadata", function(err, meta) {
     console.log("meta", meta)
     META.frames = meta.frames
     META.xdim = meta.xdim
     META.ydim = meta.ydim
+    callback();
     renderFramesUI();
   })
 }
@@ -242,8 +261,6 @@ function getAverage(callback) {
 function getFlux() {
   var dataX = []
   var dataY = []
-  var start = 191
-  var stop = 196
   pathX.forEach(function(x) { dataX.push(x/width * META.xdim)})
   pathY.forEach(function(y) { dataY.push(y/width * META.ydim)})
   var options = {
@@ -273,7 +290,7 @@ function getHotspots() {
   var options = {
     uri: URL + "findHotspots",
     method: 'POST',
-    json: { "beg": 100, "end": 196, "path": [dataX, dataY]}
+    json: { "beg": start, "end": stop, "path": [dataX, dataY]}
   };
 
   request(options, function (error, response, body) {
@@ -289,7 +306,12 @@ function getHotspots() {
 
 ipc.on("server-started", function() {
   console.log("server started!")
-  getMetadata();
+  getMetadata(function() {
+    d3.select("#slice-begin").attr("value", 0);
+    d3.select("#slice-begin").attr("max", META.frames-2);
+    d3.select("#slice-end").attr("value", META.frames-1);
+    d3.select("#slice-end").attr("max", META.frames-1);
+  });
   getAverage(function() {
     d3.select("#analysis").classed("hidden", false)
     d3.select("#loading").classed("hidden", true)

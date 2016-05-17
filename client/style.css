@@ -87,6 +87,18 @@ body {
   color: #fff;
 }
 
+#slice-begin-label {
+  display: inline-block; 
+  width: 40px;
+  text-align: right;
+}
+
+#slice-end-label {
+  display: inline-block; 
+  width: 40px;
+  text-align: right;
+}
+
 #analysis {
   display: flex;
   align-content: center;
