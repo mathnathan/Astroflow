@@ -122,8 +122,12 @@ function ready() {
     })
   d3.select("#frame").call(zoom)
   
-  d3.select("#slice-begin").on("input", handleSliceBegin);
-  d3.select("#slice-end").on("input", handleSliceEnd);
+  d3.select("#slice-begin").on("input", handleSliceBegin).on("blur", function() {
+    d3.select("#slice-begin").property("value", start);
+  });
+  d3.select("#slice-end").on("input", handleSliceEnd).on("blur", function() {
+    d3.select("#slice-end").property("value", stop);
+  });
 
   d3.select("#calcFlux-button").on("click", getFlux);
   d3.select("#findHotspots-button").on("click", getHotspots);
@@ -131,12 +135,36 @@ function ready() {
 
 function handleSliceBegin() {
   console.log("this.value = ", this.value);
-  start = this.value;
+  console.log("typeof this.value = ", typeof this.value);
+  console.log("Number(this.value) = ", Number(this.value));
+  console.log("typeof Number(this.value) = ", typeof Number(this.value));
+  begin = Number(this.value);
+  if (isNaN(begin)) console.log("IS NAN!");
+  if (begin < 0 || isNaN(begin)) {
+    start = 0;
+  } else if (begin >= stop) {
+    start = stop-1;
+  } else {
+    start = begin;
+  }
+  console.log("start = ", start);
+  console.log("stop = ", stop);
+  d3.select("#slice-end").attr("min", start+1);
 }
   
 function handleSliceEnd(newVal) {
   console.log("this.value = ", this.value);
-  stop = this.value;
+  end = Number(this.value);
+  if (end >= META.frames || isNaN(end)) {
+    stop = META.frames-1;
+  } else if (end <= start) {
+    stop = start+1;
+  } else {
+    stop = end;
+  }
+  console.log("start = ", start);
+  console.log("stop = ", stop);
+  d3.select("#slice-begin").attr("max", stop-1);
 }
 
 function renderFrame() {
@@ -314,10 +342,14 @@ function getHotspots() {
 ipc.on("server-started", function() {
   console.log("server started!")
   getMetadata(function() {
-    d3.select("#slice-begin").attr("value", 0);
-    d3.select("#slice-begin").attr("max", META.frames-2);
-    d3.select("#slice-end").attr("value", META.frames-1);
-    d3.select("#slice-end").attr("max", META.frames-1);
+    start = 0;
+    stop = META.frames-1;
+    d3.select("#slice-begin")
+      .attr("value", start)
+      .attr("max", META.frames-2);
+    d3.select("#slice-end")
+      .attr("value", stop)
+      .attr("max", stop);
   });
   getAverage(function() {
     d3.select("#analysis").classed("hidden", false)
