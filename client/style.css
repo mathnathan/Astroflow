@@ -109,7 +109,7 @@ body {
 }
 
 #controls {
-  width: 80px;
+  width: 160px;
   margin-left: 20px;
 }
 
@@ -147,8 +147,23 @@ body {
   position: relative;
 }
 
-#frames, #over-time, #frame-bars, #frame-brush, #title {
-  width: 700px;
+#frames, #over-time, #frame-bars, #frame-brush { 
+  width: 780px;
+}
+
+#title-bar {
+  width: 780px;
+  display: flex;
+  flex-flow: row;
+}
+
+#title {
+  width: 100px;
+}
+
+#mouse-location {
+  width: 500px;
+  text-align: right;
 }
 
 path.flux {

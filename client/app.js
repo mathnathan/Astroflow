@@ -27,7 +27,6 @@ var average;
 var currentFrame;
 var currentIndex = "Average";
 var flux = []
-
 var hotspots = [];
 var flows = [];
 
@@ -120,7 +119,19 @@ function ready() {
         getHotspots();
       }
     })
+
   d3.select("#frame").call(zoom)
+    .on("mousemove", function () {
+      coordinates = d3.mouse(this);
+      var x = ((coordinates[0] - tx) / scale)/width * META.xdim; 
+      var y = ((coordinates[1] - ty) / scale)/width * META.ydim;
+      var loc = "("+x.toFixed(1)+", "+y.toFixed(1)+")";
+      d3.select("#mouse-location").text(loc);})
+    .on("mouseenter", function () {
+      d3.select("#mouse-location").classed("hidden", false);})
+    .on("mouseleave", function () {
+      d3.select("#mouse-location").classed("hidden", true);
+    }); 
   
   d3.select("#slice-begin").on("input", handleSliceBegin).on("blur", function() {
     d3.select("#slice-begin").property("value", start);
@@ -308,8 +319,9 @@ function getFlux() {
       }
       // node convention is to allways put error as first argument, and pass null if no error
       // the body is the JSON payload we want
-      console.log("flux", body);
-      flux = body.flux;
+      console.log("body = ", body);
+      flux = body.results.flux;
+      console.log("flux = ", flux);
       renderFlux(start, stop);
     });
   }
@@ -335,6 +347,8 @@ function getHotspots() {
       // node convention is to allways put error as first argument, and pass null if no error
       // the body is the JSON payload we want
       console.log("hotspots", body);
+      hotspots = body.results;
+      renderHotspots(start, stop);
     });
   }
 }
