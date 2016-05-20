@@ -1,5 +1,6 @@
 # the built python libs
 bin/
+bin
 
 # Logs
 logs
