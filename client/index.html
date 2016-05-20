@@ -30,17 +30,10 @@
         <div id="canvii">
           <canvas id="frame"></canvas>
           <canvas id="curve"></canvas>
+          <svg id="overlay"></svg>
         </div>
         <div id="controls">
           <a id="draw-button" class="button">Draw</a>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <a id="average-button" class="button">Average</a>
-          <br>
-          <br>
           <br>
           <p>
             <label for="slice-begin" id="slice-begin-label">
@@ -55,17 +48,29 @@
             <input type="number" min="1" step="1" value="1" id="slice-end">
           </p>
           <br>
+          <a id="average-button" class="button">Average</a>
           <br>
+          <a id="flux-button" class="button">Calculate Flux</a>
           <br>
+          <a id="hotspots-button" class="button">Find Hotspots</a>
           <br>
-          <a id="calcFlux-button" class="button">Calculate Flux</a>
-          <br>
-          <a id="findHotspots-button" class="button">Find Hotspots</a>
+          <div id="info-panel">
+            Frame: <span class="frame"></span>
+            <br>
+            Flux: <span class="flux"></span>
+            <br>
+            Hotspots: <span class="hotspots"></span>
+            <br>
+          </div>
         </div>
       </div>
-      <div id="frames">
+      <div id="frames" class="hidden">
         <svg id="over-time">
-          <g id="flux"></g>
+          <line class="guide"></line>
+          <text class="guide"></text>
+          <g id="flux">
+            <line class="zero"></line>
+          </g>
           <g id="hotspots"></g>
         </svg>
         <div id="frame-bars"></div>

@@ -19,8 +19,13 @@ var drawing;
 var tx = 0;
 var ty = 0;
 var scale = 1;
+// path related variables
 var pathX = [];
 var pathY = [];
+var tanX = []
+var tanY = [];
+var flowX = []
+var flowY = []
 // we cache our frames and average globally
 var frameCache = {};
 var average;
@@ -28,12 +33,11 @@ var currentFrame;
 var currentIndex = "Average";
 var flux = []
 var hotspots = [];
-var flows = [];
 
 var canvas, ctx;
 var curvectx;
 
-// Global variable for slicing. Will be accessible to user and all functions should 
+// Global variable for slicing. Will be accessible to user and all functions should
 // use them
 var start = 0;
 var stop = -1;
@@ -99,6 +103,16 @@ function ready() {
       if(drawing) {
         //console.log("path", pathX, pathY)
         console.log("done drawing")
+        drawing = false;
+
+        d3.select("#draw-button")
+          .classed("active", drawing)
+          .text(function() {
+            if(drawing) return "Drawing";
+            return "Draw";
+          })
+        d3.select("#frame").classed("Drawing", drawing)
+
         var points = []
         pathX.forEach(function(x,i) {
           var y = pathY[i]
@@ -123,7 +137,7 @@ function ready() {
   d3.select("#frame").call(zoom)
     .on("mousemove", function () {
       coordinates = d3.mouse(this);
-      var x = ((coordinates[0] - tx) / scale)/width * META.xdim; 
+      var x = ((coordinates[0] - tx) / scale)/width * META.xdim;
       var y = ((coordinates[1] - ty) / scale)/width * META.ydim;
       var loc = "("+x.toFixed(1)+", "+y.toFixed(1)+")";
       d3.select("#mouse-location").text(loc);})
@@ -131,8 +145,8 @@ function ready() {
       d3.select("#mouse-location").classed("hidden", false);})
     .on("mouseleave", function () {
       d3.select("#mouse-location").classed("hidden", true);
-    }); 
-  
+    });
+
   d3.select("#slice-begin").on("input", handleSliceBegin).on("blur", function() {
     d3.select("#slice-begin").property("value", start);
   });
@@ -162,7 +176,7 @@ function handleSliceBegin() {
   console.log("stop = ", stop);
   d3.select("#slice-end").attr("min", start+1);
 }
-  
+
 function handleSliceEnd(newVal) {
   console.log("this.value = ", this.value);
   end = Number(this.value);
@@ -312,16 +326,18 @@ function getFlux() {
       json: { "beg": start, "end": stop, "path": [dataX, dataY]}
     };
 
+    d3.select("#flux-button").text("LOADING Flux")
     request(options, function (error, response, body) {
       if (!error && response.statusCode == 200) {
       } else {
         console.log("error", error);
       }
+      d3.select("#flux-button").text("Calculate Flux")
       // node convention is to allways put error as first argument, and pass null if no error
       // the body is the JSON payload we want
-      console.log("body = ", body);
-      flux = body.results.flux;
-      console.log("flux = ", flux);
+      //console.log("body = ", body);
+      flux = body.flux;
+      //console.log("flux = ", flux);
       renderFlux(start, stop);
     });
   }
@@ -339,6 +355,8 @@ function getHotspots() {
       json: { "beg": start, "end": stop, "path": [dataX, dataY]}
     };
 
+    d3.select("#hotspots-button").text("LOADING Hotspots")
+
     request(options, function (error, response, body) {
       if (!error && response.statusCode == 200) {
       } else {
@@ -346,11 +364,35 @@ function getHotspots() {
       }
       // node convention is to allways put error as first argument, and pass null if no error
       // the body is the JSON payload we want
+      d3.select("#hotspots-button").text("Find Hotspots")
       console.log("hotspots", body);
-      hotspots = body.results;
+      hotspots = processHotspots(body);
       renderHotspots(start, stop);
     });
   }
+}
+
+function processHotspots(results) {
+  var arrays = results.hotspots
+  var n = arrays[0].length;
+  var spots = [];
+  for(var i = 0; i < n; i++) {
+    var frame = arrays[0][i]
+    var pointIndex = arrays[1][i];
+    var spot = {
+      frame: frame,
+      point: {
+        x: results.pathPts[0][pointIndex],
+        y: results.pathPts[0][pointIndex],
+      },
+      slope: arrays[2][i],
+      nzero: arrays[3][i],
+      strength: arrays[4][i],
+      confidence: arrays[5][i]
+    }
+    spots.push(spot)
+  }
+  return spots;
 }
 
 ipc.on("server-started", function() {
@@ -367,6 +409,7 @@ ipc.on("server-started", function() {
   });
   getAverage(function() {
     d3.select("#analysis").classed("hidden", false)
+    d3.select("#frames").classed("hidden", false)
     d3.select("#loading").classed("hidden", true)
   });
   //getFrame(0)
