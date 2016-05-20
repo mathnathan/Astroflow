@@ -383,7 +383,7 @@ function processHotspots(results) {
       frame: frame,
       point: {
         x: results.pathPts[0][pointIndex],
-        y: results.pathPts[0][pointIndex],
+        y: results.pathPts[1][pointIndex],
       },
       slope: arrays[2][i],
       nzero: arrays[3][i],
